@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sales</title>
+  <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+  <header>
+    <strong>ERP</strong>
+    <a href="../index.html">Home</a>
+    <a href="customers.html">Customers</a>
+    <a href="catalog.html">Catalog</a>
+    <button type="button" id="logout">Log out</button>
+  </header>
+  <main>
+    <form id="sale-form">
+      <h1>Sell a product</h1>
+      <label>Customer
+        <select id="customer-id" required></select>
+      </label>
+      <label>Product
+        <select id="product-id" required></select>
+      </label>
+      <label>Quantity <input id="quantity" type="number" min="1" step="1" value="1" required></label>
+      <button type="submit">Sell</button>
+      <p id="message"></p>
+    </form>
+  </main>
+  <script src="../js/config.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/sales.js"></script>
+</body>
+</html>

@@ -1,0 +1,80 @@
+# OS
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Editors and IDEs
+.vs/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.rsuser
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+
+# Secrets and local environment
+.env
+.env.*
+!.env.example
+*.local.json
+secrets.json
+appsettings.*.local.json
+appsettings.Development.json
+
+# -----------------------------------------------------------------------------
+# ERP.Backend (.NET)
+# -----------------------------------------------------------------------------
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+[Aa]rtifacts/
+[Ll]og/
+[Ll]ogs/
+*.nupkg
+*.snupkg
+project.assets.json
+project.nuget.cache
+*.nuget.props
+*.nuget.targets
+*.pubxml
+*.publishproj
+*.azurePubxml
+publish/
+TestResults/
+[Cc]overage/
+*.coverage
+*.coveragexml
+
+# -----------------------------------------------------------------------------
+# ERP.Frontend (static site; also covers a future Node toolchain)
+# -----------------------------------------------------------------------------
+node_modules/
+dist/
+build/
+.cache/
+*.tsbuildinfo
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# -----------------------------------------------------------------------------
+# infra (Bicep / Azure CLI)
+# -----------------------------------------------------------------------------
+.azure/
+*.bicepparam.local
+azurite/
+__azurite_db*__.json
+__blobstorage__/
+__queuestorage__/
+
+# Agents/Cursor
+.cursor
+.agent
