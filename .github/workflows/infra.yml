@@ -1,0 +1,47 @@
+name: infra
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - infra/**
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_CLIENT_SUBSCRIPTION }}
+
+      - name: Deploy container registry
+        run: |
+          az deployment group create \
+            --resource-group rg-erp-demo-dev \
+            --template-file infra/acr.bicep
+
+      - name: Deploy Postgres
+        env:
+          POSTGRES_ADMIN_PASSWORD: ${{ secrets.POSTGRES_ADMIN_PASSWORD }}
+          CLIENT_IP: 152.202.62.238
+        run: |
+          az deployment group create \
+            --resource-group rg-erp-demo-dev \
+            --template-file infra/postgres.bicep \
+            --parameters postgresAdminPassword="$POSTGRES_ADMIN_PASSWORD" clientIp="$CLIENT_IP"
+
+      - name: Deploy Static Web App
+        run: |
+          az deployment group create \
+            --resource-group rg-erp-demo-dev \
+            --template-file infra/staticwebapp.bicep
