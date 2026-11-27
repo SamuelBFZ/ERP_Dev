@@ -26,11 +26,18 @@ param acrName string = 'acrerpdemodev'
 @description('Tag of the image erp-api in the registry.')
 param imageTag string = 'v1'
 
+@description('Application Insights name. Must match observability.bicep. Deploy that file first.')
+param appInsightsName string = 'appi-erp-demo-dev'
+
 var frontendUrl = 'https://${staticSiteName}.azurestaticapps.net'
 var connectionString = 'Host=${postgresServerName}.postgres.database.azure.com;Port=5432;Database=erp_db;Username=${administratorLogin};Password=${postgresAdminPassword};SSL Mode=Require'
 
 resource acr 'Microsoft.ContainerRegistry/registries@2023-07-01' existing = {
   name: acrName
+}
+
+resource insights 'Microsoft.Insights/components@2020-02-02' existing = {
+  name: appInsightsName
 }
 
 var acrCredentials = acr.listCredentials()
@@ -90,6 +97,10 @@ resource app 'Microsoft.Web/sites@2024-04-01' = {
         {
           name: 'WEBSITES_PORT'
           value: '8080'
+        }
+        {
+          name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
+          value: insights.properties.ConnectionString
         }
       ]
     }

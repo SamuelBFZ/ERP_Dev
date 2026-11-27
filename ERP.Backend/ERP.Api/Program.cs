@@ -1,3 +1,4 @@
+using Azure.Monitor.OpenTelemetry.AspNetCore;
 using ERP.Api.Data;
 using ERP.Api.Modules.Authentication.Infrastructure;
 using Microsoft.EntityFrameworkCore;
@@ -26,6 +27,11 @@ builder.Services.AddCors(options =>
     options.AddDefaultPolicy(policy =>
         policy.WithOrigins(frontendUrl).AllowAnyHeader().AllowAnyMethod());
 });
+
+if (!string.IsNullOrWhiteSpace(builder.Configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"]))
+{
+    builder.Services.AddOpenTelemetry().UseAzureMonitor();
+}
 
 var app = builder.Build();
 
