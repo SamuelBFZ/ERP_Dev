@@ -1,4 +1,4 @@
-@description('Azure region. The resource group rg-erp-demo-dev is in East US.')
+@description('Azure region.')
 param location string = 'centralus'
 
 @description('App Service plan name. Unique inside the resource group.')
@@ -20,38 +20,44 @@ param administratorLogin string = 'erpadmin'
 @description('Same administrator password passed to postgres.bicep. Used only to build the connection string.')
 param postgresAdminPassword string
 
+@description('Container Registry name. Must match acr.bicep. Deploy acr.bicep first.')
+param acrName string = 'acrerpdemodev'
+
+@description('Tag of the image erp-api in the registry.')
+param imageTag string = 'v1'
+
 var frontendUrl = 'https://${staticSiteName}.azurestaticapps.net'
 var connectionString = 'Host=${postgresServerName}.postgres.database.azure.com;Port=5432;Database=erp_db;Username=${administratorLogin};Password=${postgresAdminPassword};SSL Mode=Require'
+
+resource acr 'Microsoft.ContainerRegistry/registries@2023-07-01' existing = {
+  name: acrName
+}
+
+var acrCredentials = acr.listCredentials()
 
 resource plan 'Microsoft.Web/serverfarms@2024-04-01' = {
   name: planName
   location: location
-  kind: 'windows'
+  kind: 'linux'
   sku: {
     name: 'B1'
     tier: 'Basic'
     capacity: 1
   }
   properties: {
-    reserved: false
+    reserved: true
   }
 }
 
 resource app 'Microsoft.Web/sites@2024-04-01' = {
   name: appName
   location: location
-  kind: 'app'
+  kind: 'app,linux'
   properties: {
     serverFarmId: plan.id
     httpsOnly: true
     siteConfig: {
-      netFrameworkVersion: 'v10.0'
-      metadata: [
-        {
-          name: 'CURRENT_STACK'
-          value: 'dotnet'
-        }
-      ]
+      linuxFxVersion: 'DOCKER|${acr.properties.loginServer}/erp-api:${imageTag}'
       appSettings: [
         {
           name: 'ConnectionStrings__DefaultConnection'
@@ -68,6 +74,22 @@ resource app 'Microsoft.Web/sites@2024-04-01' = {
         {
           name: 'Auth__Token'
           value: 'dev-token'
+        }
+        {
+          name: 'DOCKER_REGISTRY_SERVER_URL'
+          value: 'https://${acr.properties.loginServer}'
+        }
+        {
+          name: 'DOCKER_REGISTRY_SERVER_USERNAME'
+          value: acrCredentials.username
+        }
+        {
+          name: 'DOCKER_REGISTRY_SERVER_PASSWORD'
+          value: acrCredentials.passwords[0].value
+        }
+        {
+          name: 'WEBSITES_PORT'
+          value: '8080'
         }
       ]
     }
