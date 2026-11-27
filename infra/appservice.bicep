@@ -1,5 +1,5 @@
 @description('Azure region.')
-param location string = 'centralus'
+param location string = 'australiacentral'
 
 @description('App Service plan name. Unique inside the resource group.')
 param planName string = 'asp-erp-demo-dev'
